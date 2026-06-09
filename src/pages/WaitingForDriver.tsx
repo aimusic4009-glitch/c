@@ -145,7 +145,10 @@ export const WaitingForDriver: React.FC<WaitingForDriverProps> = ({
                 destination: order.dropoff?.address,
                 driverId: order.driver?.id,
                 driverInfo: order.driver,
-                encodedPolyline
+                encodedPolyline,
+                // Explicitly forward these so DriverComing's mount effect can seed immediately
+                driverToPickupPolyline: (order as any).driverToPickupPolyline ?? undefined,
+                driverToPickupEtaMinutes: (order as any).driverToPickupEtaMinutes ?? undefined,
               }
             }
           });
