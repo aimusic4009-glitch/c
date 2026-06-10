@@ -412,6 +412,9 @@ export const ConfirmOrder: React.FC<ConfirmOrderProps> = ({
             ...(isStoreFlow && {
               storeName: orderData.storeName,
               storeId: orderData.storeId,
+              storeImage: orderData.storeImage || '',
+              storeAddress: orderData.storeAddress || '',
+              storeLocation: orderData.storeLocation || undefined,
               items: orderData.items,
               subtotal: orderData.subtotal || orderData.foodSubtotal,
               deliveryFee: orderData.deliveryFee,

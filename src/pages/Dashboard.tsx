@@ -18,7 +18,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSearchSelect }) => {
   const navigate = useNavigate();
   const [panelHeight, setPanelHeight] = useState(450);
   const { isRideActive, rideStatus } = useRideContext();
-  const { latitude, longitude, loading: locationLoading } = useGeolocation();
+  const { latitude, longitude, loading: locationLoading, error: locationError } = useGeolocation();
   const [recentAddresses, setRecentAddresses] = useState<GeoapifyAddress[]>([]);
   const [isLoadingRecentAddress, setIsLoadingRecentAddress] = useState(false);
 
@@ -76,14 +76,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSearchSelect }) => {
     try {
       // Get user's current location as pickup
       if (!latitude || !longitude) {
-        alert('Unable to get your current location. Please enable location services.');
+        const errorMsg = locationLoading
+          ? 'Getting your location, please wait...'
+          : locationError
+            ? `Location error: ${locationError}`
+            : 'Unable to get your current location. Please enable location services and refresh the page.';
+        alert(errorMsg);
         setIsLoadingRecentAddress(false);
         return;
       }
 
       // Reverse geocode to get pickup address
       const pickupResult = await reverseGeocode(latitude, longitude);
-      
+
       if (!pickupResult) {
         alert('Unable to get your current address. Please try again.');
         setIsLoadingRecentAddress(false);
@@ -112,7 +117,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onSearchSelect }) => {
     } finally {
       setIsLoadingRecentAddress(false);
     }
-  }, [latitude, longitude, isRideActive, rideStatus, navigate]);
+  }, [latitude, longitude, locationLoading, locationError, isRideActive, rideStatus, navigate]);
 
   const handleAletwendeClick = () => {
     navigate('/aletwende-send');

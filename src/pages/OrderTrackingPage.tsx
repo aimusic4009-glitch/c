@@ -16,6 +16,8 @@ interface OrderData {
   id?: string;
   storeName?: string;
   storeAddress?: string;
+  storeImage?: string;
+  storeId?: string;
   items?: OrderItem[];
   subtotal?: number;
   deliveryFee?: number;
@@ -182,12 +184,19 @@ export const OrderTrackingPage: React.FC = () => {
     const unsubscribe = onSnapshot(orderRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data() as OrderData;
-        setOrderData({ ...data, id: orderId });
+        // Preserve storeImage from initial data if not in Firestore
+        setOrderData({
+          ...data,
+          id: orderId,
+          storeImage: initialOrderData?.storeImage || (data as any).storeImage || '',
+          storeName: data.storeName || initialOrderData?.storeName,
+          storeId: data.storeId || initialOrderData?.storeId,
+        });
       }
     });
 
     return () => unsubscribe();
-  }, [orderId]);
+  }, [orderId, initialOrderData]);
 
   // Handle "Preparing Items" delay when status becomes "accepted"
   useEffect(() => {
@@ -231,6 +240,11 @@ export const OrderTrackingPage: React.FC = () => {
             orderData: {
               ...orderData,
               id: orderId,
+              // Carry store info so the store marker and rating modal work.
+              storeId: orderData.storeId || (orderData as any).storeId,
+              storeName: orderData.storeName || (orderData as any).storeName,
+              storeImage: (orderData as any).storeImage || '',
+              storeAddress: orderData.storeAddress || (orderData as any).storeAddress,
               // Carry store/pickup location so the store marker renders immediately.
               // Firestore stores it as flat pickupLat/pickupLng fields.
               storeLocation: (orderData as any).storeLocation
