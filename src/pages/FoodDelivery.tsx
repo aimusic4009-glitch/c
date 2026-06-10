@@ -372,6 +372,7 @@ export function FoodDelivery() {
           storeName: storeName,
           storeAddress: storeAddress,
           storeLocation: storeLocation,
+          storeImage: routeData.storeImage || '',
           destinationAddress: routeData.deliveryLocation || 'Destination',
           stops: stops || [],
           items: cart,

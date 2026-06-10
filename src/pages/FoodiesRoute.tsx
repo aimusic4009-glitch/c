@@ -338,10 +338,12 @@ export function FoodiesRoute() {
     // Fetch the store document to get its real GPS coordinates. FoodDelivery
     // requires real store coordinates to request delivery options from the backend.
     let storeLocation = (cart[0] as any)?.storeLocation || { lat: null, lng: null };
+    let storeImage = '';
     try {
       if (storeId) {
         const storeDoc = await fetchStoreById(storeId);
         storeLocation = storeDoc?.location ?? storeLocation;
+        storeImage = storeDoc?.logo || '';
       }
     } catch (error) {
       console.error('Failed to fetch store location:', error);
@@ -354,6 +356,7 @@ export function FoodiesRoute() {
       storeName,
       storeAddress,
       storeLocation, // Store GPS coordinates
+      storeImage,
       category,
       stops: stops.map(stop => ({
         id: stop.id,
