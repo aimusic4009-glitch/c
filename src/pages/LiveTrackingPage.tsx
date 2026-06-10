@@ -196,7 +196,14 @@ export const LiveTrackingPage: React.FC = () => {
         // The Firestore order document stores the store/pickup as flat fields, not a nested object.
         const pickupLat = (data as any).pickupLat;
         const pickupLng = (data as any).pickupLng;
-        const normalized: OrderData = { ...data, id: orderId };
+        const normalized: OrderData = {
+          ...data,
+          id: orderId,
+          // Preserve storeImage from initial data since Firestore doesn't store it
+          storeImage: initialOrderData?.storeImage || (data as any).storeImage || '',
+          storeName: data.storeName || initialOrderData?.storeName,
+          storeId: data.storeId || initialOrderData?.storeId,
+        };
         if (!normalized.storeLocation && typeof pickupLat === 'number' && typeof pickupLng === 'number') {
           normalized.storeLocation = { lat: pickupLat, lng: pickupLng };
         }
@@ -386,7 +393,7 @@ export const LiveTrackingPage: React.FC = () => {
         gpsListenerRef.current = null;
       }
     };
-  }, [orderId]);
+  }, [orderId, initialOrderData]);
 
   const handleCall = () => {
     if (driverData?.phone) {

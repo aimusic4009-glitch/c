@@ -4,20 +4,16 @@ import { ArrowLeft, Users } from 'lucide-react';
 import { MapLibreMap, MapMarker } from '../components/MapLibreMap';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useRideContext } from '../contexts/RideContext';
+import { useGeolocation } from '../hooks/useGeolocation';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { auth } from '../config/firebase';
-import { 
-  createOrder, 
+import {
+  createOrder,
   ServiceType,
   CategoryType,
   WorkflowType,
-  CreateOrderInput 
+  CreateOrderInput
 } from '../services/orderService';
-
-interface UserLocation {
-  lat: number | null;
-  lng: number | null;
-}
 
 interface RideData {
   pricingId: string;
@@ -55,27 +51,9 @@ export const ConfirmOrder: React.FC<ConfirmOrderProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
-  const [userLocation, setUserLocation] = useState<UserLocation>({ lat: null, lng: null });
   const { profile } = useUserProfile();
   const { isRideActive } = useRideContext();
-
-  // Get user's GPS location on component mount
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.error('Error getting user location:', error);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
-      );
-    }
-  }, []);
+  const { latitude, longitude } = useGeolocation();
 
   const {
     orderType = 'ride',
@@ -277,8 +255,8 @@ export const ConfirmOrder: React.FC<ConfirmOrderProps> = ({
       // Locations (exact spec format)
       pickupAddress: finalPickup || pickupAddress || '',
       destinationAddress: finalDestination || destinationAddress || '',
-      pickupLat: pickupCoords?.lat || userLocation.lat || null,
-      pickupLng: pickupCoords?.lng || userLocation.lng || null,
+      pickupLat: pickupCoords?.lat || latitude || null,
+      pickupLng: pickupCoords?.lng || longitude || null,
       dropLat: destinationCoords?.lat || null,
       dropLng: destinationCoords?.lng || null,
       
